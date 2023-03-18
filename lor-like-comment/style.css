@@ -1,0 +1,57 @@
+/* Library of Ruina風コメントのカスタマイズ用パラメータ */
+:root {
+  /* コメントの基準フォントサイズ (コメント本文に適用するフォントサイズと同じ) */
+  font-size: 32pt;
+
+  /* コメントのフォント色 */
+  --lor-like-comment-color: #000000;
+  /* コメントの周囲のもやもやの前面色 (text-shadowによるぼかした影で表現するのでアルファ値の指定は不要です)*/
+  --lor-like-comment-stroke-fore-color: #c00000;
+  /* コメントの周囲のもやもやの背面色 (-webkit-text-strokeによるフォントの縁取りで表現するのでアルファ値の指定が必要です) */
+  --lor-like-comment-stroke-back-color: #c0000080;
+  /* コメントのフォント (左に指定したフォントから優先的に使用します) */
+  --lor-like-comment-font-family: "07ロゴたいぷゴシック7", "メイリオ", sans-serif;
+}
+
+/* Library of Ruina風コメントの実装部分 */
+.comment-text {
+  position: relative;
+  color: var(--lor-like-comment-color);
+  font-family: var(--lor-like-comment-font-family);
+  font-size: 1rem;
+  text-shadow: 0 0 0.15em var(--lor-like-comment-stroke-fore-color);
+  -webkit-text-stroke: 0.1em var(--lor-like-comment-stroke-back-color);
+  text-align: center;
+}
+.comment-text-front {
+  position: absolute;
+  text-shadow: none;
+  -webkit-text-stroke: 0 transparent;
+}
+.paid-text {
+  position: relative;
+  color: var(--lor-like-comment-color);
+  font-family: var(--lor-like-comment-font-family);
+  font-size: 0.5rem;
+  text-shadow: 0 0 0.15em var(--lor-like-comment-stroke-fore-color);
+  -webkit-text-stroke: 0.1em var(--lor-like-comment-stroke-back-color);
+}
+.paid-text::before {
+  position: absolute;
+  content: attr(data-text);
+  text-shadow: none;
+  -webkit-text-stroke: 0 transparent;
+}
+
+.typing-animation-front, .typing-animation-shadow {
+  display: inline-block;
+  opacity: 0;
+}
+.typing-animation-front.is-active, .typing-animation-shadow.is-active {
+  opacity: 1;
+}
+
+/* 不要な要素を非表示にする */
+.avatar, .name {
+  display: none;
+}
