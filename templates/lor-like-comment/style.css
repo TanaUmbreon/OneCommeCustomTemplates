@@ -43,11 +43,11 @@
   -webkit-text-stroke: 0 transparent;
 }
 
-.typing-animation-front, .typing-animation-shadow {
+.typing-front, .typing-shadow {
   display: inline-block;
   opacity: 0;
 }
-.typing-animation-front.is-active, .typing-animation-shadow.is-active {
+.typing-front.is-active, .typing-shadow.is-active {
   opacity: 1;
 }
 
