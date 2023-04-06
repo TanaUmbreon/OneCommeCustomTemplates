@@ -1,0 +1,14 @@
+{
+  "extends": ["eslint:recommended", "plugin:security/recommended", "prettier"],
+  "plugins": ["security"],
+  "parserOptions": {
+    "ecmaVersion": 2015,
+    "sourceType": "module"
+  },
+  "env": {
+    "es6": true,
+    "browser": true,
+    "node": true
+  },
+  "rules": {}
+}
