@@ -29,17 +29,8 @@
           <div class="comment-block">
             <div class="name">
               {{comment.data.displayName}}
-              <div
-                class="badge"
-                v-for="(badge, index) in comment.data.badges"
-                :key="index"
-              >
-                <img
-                  v-if="badge.url"
-                  :alt="badge.label"
-                  :src="badge.url"
-                  :title="badge.label"
-                />
+              <div class="badge" v-for="(badge, index) in comment.data.badges" :key="index">
+                <img v-if="badge.url" :alt="badge.label" :src="badge.url" :title="badge.label" />
               </div>
             </div>
             <div class="comment-body">
@@ -48,21 +39,13 @@
                   <strong>{{comment.data.paidText}}</strong>
                 </div>
               </template>
-              <div
-                v-if="comment.data.comment.startsWith('<img ') && comment.data.comment.includes('class=&quot;gift-image gift-sticker&quot;')"
-                class="comment-text"
-                v-html="comment.data.comment"
-              ></div>
-              <div
-                v-else
-                class="comment-text"
-                v-html="getCommentTextHtml(comment)"
-              ></div>
+              <div class="comment-text" v-html="comment.html"></div>
             </div>
           </div>
         </div>
       </transition-group>
     </div>
+    <script src="../__origin/js/html-escaper.min.js"></script>
     <script src="../__origin/js/vue.min.js"></script>
     <script src="../__origin/js/onesdk.js"></script>
     <script src="./script.js"></script>
