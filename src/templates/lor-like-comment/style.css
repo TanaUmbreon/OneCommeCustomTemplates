@@ -52,6 +52,6 @@
 }
 
 /* 不要な要素を非表示にする */
-.avatar, .name {
+.avatar, .name, .comment-text-for-speech {
   display: none;
 }

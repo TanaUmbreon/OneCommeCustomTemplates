@@ -39,7 +39,8 @@
                   <strong>{{comment.data.paidText}}</strong>
                 </div>
               </template>
-              <div class="comment-text" v-html="comment.html"></div>
+              <div class="comment-text" aria-hidden="true" v-html="comment.animationContent"></div>
+              <div class="comment-text-for-speech" v-html="comment.speechContent"></div>
             </div>
           </div>
         </div>
