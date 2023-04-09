@@ -1,14 +1,25 @@
 {
+  "root": true,
   "extends": ["eslint:recommended", "plugin:security/recommended", "prettier"],
   "plugins": ["security"],
   "parserOptions": {
-    "ecmaVersion": 2015,
+    "ecmaVersion": 2022,
     "sourceType": "module"
   },
   "env": {
     "es6": true,
     "browser": true,
-    "node": true
+    "node": false
   },
-  "rules": {}
+  "rules": {
+    "no-var": "error",
+    "semi": "warn",
+    "no-unused-vars": "warn",
+    "no-restricted-imports": ["error", { "patterns": ["*"] }] // わんコメで非対応のため禁止
+  },
+  "globals": {
+    "Vue": "readonly",
+    "OneSDK": "readonly",
+    "html": "readonly" // html-escaperをimportせずに使用する
+  }
 }

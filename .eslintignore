@@ -1,0 +1,20 @@
+# ESLintによるチェックを行わないファイル・フォルダパスをここに指定する
+
+## 「わんコメ」のデフォルトテンプレート
+**/__origin/*
+**/__pro/*
+**/basic/*
+**/cool-pop/*
+**/flipboard/*
+**/ktx-quick-starter/*
+**/line/*
+**/line-right/*
+**/neon/*
+**/newsticker/*
+**/persona/*
+**/persona-right/*
+**/retro/*
+**/slim/*
+**/word-party-preset/*
+**/yurucamp/*
+**/yurucamp-right/*
