@@ -150,6 +150,13 @@ class LorAnimationChar {
     return this.#content;
   }
 
+  /** @type {boolean} 文字の代わりに img 要素を用いている事を示す値 */
+  #isImage;
+  /** @type {boolean} 文字の代わりに img 要素を用いている事を示す値 */
+  get isImage() {
+    return this.#isImage;
+  }
+
   /** @type {boolean} この文字をアクティブ化してタイピングアニメーションを行った事を示す値 */
   #hasActivated;
   /** @type {boolean} この文字をアクティブ化してタイピングアニメーションを行った事を示す値 */
@@ -162,11 +169,13 @@ class LorAnimationChar {
    * @param {string} frontId フロント側の文字の span 要素を特定する ID 名
    * @param {string} shadowId 影側の文字の span 要素を特定する ID 名
    * @param {string} content 文字を表す HTML 要素のコンテンツ
+   * @param {boolean} isImage 文字の代わりに img 要素を用いている事を示す値
    */
-  constructor(frontId, shadowId, content) {
+  constructor(frontId, shadowId, content, isImage) {
     this.#frontId = frontId;
     this.#shadowId = shadowId;
     this.#content = content;
+    this.#isImage = isImage;
     this.#hasActivated = false;
   }
 
@@ -211,8 +220,6 @@ class LorAnimationComment {
   animationContent;
   /** @type {string} 読み上げ用のコメント本文として使用する HTML ソースコード */
   speechContent;
-  /** @type {boolean} 画像データで構成されたギフトステッカーである事を示す値 */
-  #isGiftSticker;
 
   /** @type {LorAnimationChar[]} LoR 風アニメーションを行うコメント文字のリスト */
   #characters;
@@ -233,37 +240,31 @@ class LorAnimationComment {
     this.commentIndex = oneComment.commentIndex;
 
     this.style = this.#buildStyle();
-    this.animationContent = "";
-    this.#isGiftSticker = this.#isGiftStickerComment(oneComment);
+    this.#characters = this.#buildCharacters(oneComment);
 
-    this.speechContent = this.#isGiftSticker
-      ? oneComment.data.comment
-      : html.escape(oneComment.data.comment);
-    this.#characters = this.#isGiftSticker
-      ? this.#buildCharactersAsGiftSticker(oneComment)
-      : this.#buildCharacters(oneComment);
+    let content = "";
+    this.#characters.forEach((c) => (content += c.content));
+    this.animationContent = content;
+    this.speechContent = content;
   }
 
   /**
    * 現在の状態に基づいて HTML ソースコードをリフレッシュします。
    */
   refreshContent() {
-    this.animationContent = "";
-
-    if (this.#isGiftSticker) {
-      this.#characters.forEach((c) => {
-        this.animationContent += `<span id="${c.frontId}">${c.content}</span>`;
-      });
-      return;
-    }
-
     let front = "";
     let shadow = "";
     this.#characters.forEach((c) => {
-      const isActive = c.hasActivated ? " " + IS_ACTIVE : "";
-      front += `<span id="${c.frontId}" class="typing-front${isActive}">${c.content}</span>`;
-      shadow += `<span id="${c.shadowId}" class="typing-shadow${isActive}">${c.content}</span>`;
+      if (c.isImage) {
+        const isActive = c.hasActivated ? ` class="${IS_ACTIVE}"` : "";
+        front += `<span id="${c.frontId}"${isActive}>${c.content}</span>`;
+      } else {
+        const isActive = c.hasActivated ? " " + IS_ACTIVE : "";
+        front += `<span id="${c.frontId}" class="typing-front${isActive}">${c.content}</span>`;
+        shadow += `<span id="${c.shadowId}" class="typing-shadow${isActive}">${c.content}</span>`;
+      }
     });
+
     this.animationContent = `<div class="comment-text-front">${front}</div>${shadow}</div>`;
   }
 
@@ -287,17 +288,6 @@ class LorAnimationComment {
   }
 
   /**
-   * 指定した OneSDK コメントが画像データで構成されたギフトステッカーである事を判定します。
-   * @param {CommonData} oneComment OneSDK コメント。
-   * @returns {boolean} ギフトステッカーの場合は true、そうでない場合は false。
-   */
-  #isGiftStickerComment(oneComment) {
-    const text = oneComment.data.comment;
-
-    return text.startsWith("<img ") && text.includes(`class="gift-image gift-sticker"`);
-  }
-
-  /**
    * 指定した OneSDK コメントからコメント文字のリストを構築して返します。
    * @param {CommonData} oneComment OneSDK コメント。
    * @returns {LorAnimationChar[]} コメント文字のリスト。
@@ -306,23 +296,37 @@ class LorAnimationComment {
     /** @type {LorAnimationChar[]} */
     const characters = [];
     const commentId = oneComment.data.id;
-    const comment = oneComment.data.comment;
 
-    for (let i = 0; i < comment.length; i++) {
-      const content = html.escape(comment.charAt(i));
-      characters.push(new LorAnimationChar(`${commentId}-${i}-front`, `${commentId}-${i}-shadow`, content));
+    let comment = oneComment.data.comment;
+    let position = 0; // 変数commentに対する文字の参照位置
+    while (comment.length >= position) {
+      const char = comment.charAt(position);
+      const index = characters.length;
+
+      // Note:
+      // 参照した文字charが<img>要素の開始だった場合は<img>要素丸ごと1つ、それ以外はエスケープしたものをコメント文字として扱う。
+
+      // パフォーマンスを確保するため、参照位置の文字が<img>要素の開始文字「<」であった場合に初めて正規表現で判断する。
+      // さらに、<img>要素でない間はcomment変数の文字をcharAt()関数でのみ参照する。
+      // <img>要素となった時点で初めて、comment変数を先頭から参照位置まで切り落とし、
+      // <img>要素の部分を取得してLorAnimationCharを作成し、その後<img>要素の部分もcomment変数から切り落とす。
+      if (char == "<") {
+        const trimed = comment.substring(position);
+        const matched = trimed.match(/^<img\s.+?>/g);
+        if (matched != null) {
+          characters.push(new LorAnimationChar(`${commentId}-${index}-front`, "", matched[0], true));
+          comment = trimed.substring(matched[0].length);
+          position = 0;
+          continue;
+        }
+      }
+
+      const escaped = html.escape(char);
+      characters.push(new LorAnimationChar(`${commentId}-${index}-front`, `${commentId}-${index}-shadow`, escaped));
+      position++;
     }
 
     return characters;
-  }
-
-  /**
-   * 指定した OneSDK コメントからギフトステッカーとしてコメント文字のリストを構築して返します。
-   * @param {CommonData} oneComment OneSDK コメント。
-   * @returns {LorAnimationChar[]} コメント文字のリスト。
-   */
-  #buildCharactersAsGiftSticker(oneComment) {
-    return [new LorAnimationChar(oneComment.data.id, "", oneComment.data.comment)];
   }
 }
 
@@ -374,7 +378,7 @@ class LorAnimator {
       lorComment.refreshContent();
       this.#commentMap.set(id, lorComment);
       this.#commentList.push(lorComment);
-      this.#typingQueue.push(...lorComment.characters.filter(c => !c.hasActivated));
+      this.#typingQueue.push(...lorComment.characters.filter((c) => !c.hasActivated));
     });
 
     this.#startTypingAnimation();
