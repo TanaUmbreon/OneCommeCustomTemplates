@@ -17,7 +17,7 @@ function Main() {
         # ソースコードフォルダーのパス
         $srcDirPath = [Path]::Combine($rootDirPath, "src")
         # デプロイから除外するフォルダーの名前(正規表現パターンで指定)
-        $excludesDirNamePattern = "^(__origin|__pro|basic|cool-pop|flipboard|ktx-quick-starter|line|line-right|neon|newsticker|persona|persona-right|retro|slim|word-party-preset|yurucamp|yurucamp-right)$"
+        $excludesDirNamePattern = "^(types|__origin|__pro|basic|cool-pop|flipboard|ktx-quick-starter|line|line-right|neon|newsticker|persona|persona-right|retro|slim|word-party-preset|yurucamp|yurucamp-right)$"
 
         ThrowIf-DirectoryNotFound $templateDirPath ([String]::Format($TEMPLATE_DIRECTORY_NOT_FOUND, $templateDirPath))
         ThrowIf-DirectoryNotFound $srcDirPath ([String]::Format($SOURCE_DIRECTORY_NOT_FOUND, $srcDirPath))

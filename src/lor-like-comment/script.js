@@ -1,28 +1,5 @@
-// OneSDK コメントの型定義
-// 【参考】https://onecomme.com/docs/developer/comment-json
-/**
- * @typedef {object} BaseComment OneSDK コメントの共通情報
- * @property {string} id コメント ID
- * @property {string} userId 配信サイトでのユーザー識別 ID(匿名の場合もあるため保障されない)
- * @property {string} liveId 配信識別子
- * @property {string} name ユーザー名(コメント投稿者名)
- * @property {boolean} isFirstTime 接続開始してから最初のコメントを表す値
- * @property {boolean} isOwner 配信者自身を表す値
- * @property {string?} displayName 表示ユーザー名(わんコメで文字数カットされたユーザー名)
- * @property {boolean} hasGift ギフトデータを持っていることを表す値
- * @property {string} profileImage プロフィールアイコン URL(名前アイコンに置き換えられることがある)
- * @property {string} originalProfileImage オリジナルのプロフィールアイコン URL
- * @property {string} comment コメント本文(HTML はエスケープ・画像はimgタグになっている)
- */
-/**
- * @typedef {object} CommonData OneSDK で扱う、配信サービスに投稿された単一のコメントを表します。
- * @property {string} id 視聴枠を識別するための ID
- * @property {string} service 配信サイト識別子
- * @property {string} name わんコメで視聴枠につけた任意の名前
- * @property {string} url 視聴 URL
- * @property {BaseComment} data コメントの共通情報
- * @property {number} commentIndex コメントのインデックス番号
- */
+/** @typedef {import("../types/onesdk").BaseComment} BaseComment */
+/** @typedef {import("../types/onesdk").CommonData} CommonData */
 
 const JSON_PATH = "../../comment.json";
 
