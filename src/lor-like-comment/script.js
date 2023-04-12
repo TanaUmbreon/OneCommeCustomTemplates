@@ -22,8 +22,12 @@ const COMMENT_OFFSET_MAX = 50;
 /** @type {number} コメントの次の文字を表示する間隔[ミリ秒] */
 const DELAY_MILLISECONDS = 150;
 
-/** @type {string} コメントの文字が表示状態になっていることを表すクラス名 */
-const IS_ACTIVE = "is-active";
+/** @type {string} コメントの単一文字が表示状態になっていることを表すクラス名 */
+const IS_ACTIVE_STYLE = "is-active";
+/** @type {string} コメントの単一文字のブロックを表すクラス名 */
+const TYPING_BLOCK_STYLE = "typing-block";
+/** @type {string} 表示領域だけ確保して非表示にするコメントの単一文字を表すクラス名 */
+const HIDDEN_STYLE = "hidden";
 
 /** @type {number} コメントが完全に表示されてからフェードアウトが始まるまでの時間[ミリ秒] */
 const COMMENT_DISPLAY_MILLISECONDS = 10000;
@@ -169,8 +173,8 @@ class LorAnimationChar {
       return;
     }
 
-    document.getElementById(this.#frontId)?.classList.add(IS_ACTIVE);
-    document.getElementById(this.#shadowId)?.classList.add(IS_ACTIVE);
+    document.getElementById(this.#frontId)?.classList.add(IS_ACTIVE_STYLE);
+    document.getElementById(this.#shadowId)?.classList.add(IS_ACTIVE_STYLE);
     this.#hasActivated = true;
   }
 }
@@ -237,14 +241,10 @@ class LorAnimationComment {
     let front = "";
     let shadow = "";
     this.#characters.forEach((c) => {
-      if (c.isImage) {
-        const isActive = c.hasActivated ? ` class="${IS_ACTIVE}"` : "";
-        front += `<span id="${c.frontId}"${isActive}>${c.content}</span>`;
-      } else {
-        const isActive = c.hasActivated ? " " + IS_ACTIVE : "";
-        front += `<span id="${c.frontId}" class="typing-front${isActive}">${c.content}</span>`;
-        shadow += `<span id="${c.shadowId}" class="typing-shadow${isActive}">${c.content}</span>`;
-      }
+      const isActiveStyle = c.hasActivated ? IS_ACTIVE_STYLE : "";
+      const isImageStyle = c.isImage ? HIDDEN_STYLE : "";
+      front += `<span id="${c.frontId}" class="${TYPING_BLOCK_STYLE} ${isActiveStyle}">${c.content}</span>`;
+      shadow += `<span id="${c.shadowId}" class="${TYPING_BLOCK_STYLE} ${isImageStyle} ${isActiveStyle}">${c.content}</span>`;
     });
 
     this.animationContent = `<div class="comment-text-front">${front}</div>${shadow}</div>`;
@@ -283,7 +283,7 @@ class LorAnimationComment {
     let position = 0; // 変数commentに対する文字の参照位置
     while (comment.length >= position) {
       const char = comment.charAt(position);
-      const index = characters.length;
+      const idPrefix = `${commentId}-${characters.length}`;
 
       // Note:
       // 参照した文字charが<img>要素の開始だった場合は<img>要素丸ごと1つ、それ以外はエスケープしたものをコメント文字として扱う。
@@ -296,7 +296,7 @@ class LorAnimationComment {
         const trimed = comment.substring(position);
         const matched = trimed.match(/^<img\s.+?>/g);
         if (matched != null) {
-          characters.push(new LorAnimationChar(`${commentId}-${index}-front`, "", matched[0], true));
+          characters.push(new LorAnimationChar(`${idPrefix}-front`, `${idPrefix}-shadow`, matched[0], true));
           comment = trimed.substring(matched[0].length);
           position = 0;
           continue;
@@ -304,7 +304,7 @@ class LorAnimationComment {
       }
 
       const escaped = this.#escape(char);
-      characters.push(new LorAnimationChar(`${commentId}-${index}-front`, `${commentId}-${index}-shadow`, escaped, false));
+      characters.push(new LorAnimationChar(`${idPrefix}-front`, `${idPrefix}-shadow`, escaped, false));
       position++;
     }
 

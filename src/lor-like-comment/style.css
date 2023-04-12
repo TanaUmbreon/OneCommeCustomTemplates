@@ -43,12 +43,15 @@
   -webkit-text-stroke: 0 transparent;
 }
 
-.typing-front, .typing-shadow {
+.typing-block {
   display: inline-block;
   opacity: 0;
 }
-.typing-front.is-active, .typing-shadow.is-active {
+.typing-block.is-active {
   opacity: 1;
+}
+.hidden {
+  visibility: hidden;
 }
 
 /* 不要な要素を非表示にする */
