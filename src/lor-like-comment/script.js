@@ -1,5 +1,10 @@
 /** @typedef {import("../types/onesdk").BaseComment} BaseComment */
 /** @typedef {import("../types/onesdk").CommonData} CommonData */
+/**
+ * @callback escape 指定した文字列に含まれる HTML エンティティ (`&`, `<`, `>`, `"`, `'`) を参照文字にエスケープして返します。
+ * @param {string} es エスケープする対象の文字列。
+ * @return {string} エスケープされた es と同等の文字列。
+ */
 
 const JSON_PATH = "../../comment.json";
 
@@ -298,12 +303,23 @@ class LorAnimationComment {
         }
       }
 
-      const escaped = html.escape(char);
-      characters.push(new LorAnimationChar(`${commentId}-${index}-front`, `${commentId}-${index}-shadow`, escaped));
+      const escaped = this.#escape(char);
+      characters.push(new LorAnimationChar(`${commentId}-${index}-front`, `${commentId}-${index}-shadow`, escaped, false));
       position++;
     }
 
     return characters;
+  }
+
+  /**
+   * 指定した文字列に含まれる HTML エンティティ (`&`, `<`, `>`, `"`, `'`) と半角スペースを参照文字にエスケープして返します。
+   * @param {string} text エスケープ対象の文字列。
+   * @returns {string} 参照文字にエスケープされた text と同等の文字列。
+   */
+  #escape(text) {
+    /** @type {string} */
+    const escaped = html.escape(text);
+    return escaped.replace(" ", "&nbsp;");
   }
 }
 
