@@ -38,6 +38,12 @@
       "source.fixAll.eslint": true // 上書き保存時にESLintのFix機能を実行する
     },
   },
+  "[typescript]": {
+    "editor.detectIndentation": true,
+    "editor.tabSize": 2,
+    "editor.insertSpaces": true,
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+  },
   "[json]": {
     "editor.detectIndentation": true,
     "editor.tabSize": 2,
