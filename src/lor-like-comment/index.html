@@ -35,7 +35,7 @@
             </div>
             <div class="comment-body">
               <template v-if="comment.service === 'youtube'">
-                <div v-if="comment.data.paidText" class="paid-text" :data-text="comment.data.paidText">
+                <div v-if="comment.data.paidText" class="paid-text">
                   <strong>{{comment.data.paidText}}</strong>
                 </div>
               </template>
