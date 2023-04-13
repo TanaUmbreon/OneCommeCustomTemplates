@@ -22,7 +22,7 @@ const COMMENT_OFFSET_MAX = 50;
 /** @type {number} コメントの次の文字を表示する間隔[ミリ秒] */
 const DELAY_MILLISECONDS = 150;
 
-/** @type {string} コメントの単一文字が表示状態になっていることを表すクラス名 */
+/** @type {string} コメントの単一文字が表示状態になっている事を表すクラス名 */
 const IS_ACTIVE_STYLE = "is-active";
 /** @type {string} コメントの単一文字のブロックを表すクラス名 */
 const TYPING_BLOCK_STYLE = "typing-block";
@@ -115,23 +115,23 @@ class Random {
  * LoR (Library Of Ruina) 風アニメーションを行うコメント本文の単一の文字を表します。
  */
 class LorAnimationChar {
-  /** @type {string} フロント側の文字の span 要素を特定する ID 名 */
-  #frontId;
-  /** @type {string} フロント側の文字の span 要素を特定する ID 名 */
-  get frontId() {
-    return this.#frontId;
+  /** @type {LorAnimationComment} このコメント文字が含まれるコメント */
+  #owner;
+  /** @type {LorAnimationComment} このコメント文字が含まれるコメント */
+  get owner() {
+    return this.#owner;
   }
 
-  /** @type {string} 影側の文字の span 要素を特定する ID 名 */
-  #shadowId;
-  /** @type {string} 影側の文字の span 要素を特定する ID 名 */
-  get shadowId() {
-    return this.#shadowId;
+  /** @type {string} コメント文字の要素を特定する ID 名 */
+  #id;
+  /** @type {string} コメント文字の要素を特定する ID 名 */
+  get id() {
+    return this.#id;
   }
 
-  /** @type {string} 文字を表す HTML 要素のコンテンツ */
+  /** @type {string} コメント文字を表す HTML 要素のコンテンツ */
   #content;
-  /** @type {string} 文字を表す HTML 要素のコンテンツ */
+  /** @type {string} コメント文字を表す HTML 要素のコンテンツ */
   get content() {
     return this.#content;
   }
@@ -152,14 +152,14 @@ class LorAnimationChar {
 
   /**
    * LorTypingChar のインスタンスを生成します。
-   * @param {string} frontId フロント側の文字の span 要素を特定する ID 名
-   * @param {string} shadowId 影側の文字の span 要素を特定する ID 名
-   * @param {string} content 文字を表す HTML 要素のコンテンツ
-   * @param {boolean} isImage 文字の代わりに img 要素を用いている事を示す値
+   * @param {LorAnimationComment} owner このコメント文字が含まれるコメント。
+   * @param {string} id コメント文字の要素を特定する ID 名。
+   * @param {string} content 文字を表す HTML 要素のコンテンツ。
+   * @param {boolean} isImage 文字の代わりに img 要素を用いている事を示す値。
    */
-  constructor(frontId, shadowId, content, isImage) {
-    this.#frontId = frontId;
-    this.#shadowId = shadowId;
+  constructor(owner, id, content, isImage) {
+    this.#owner = owner;
+    this.#id = id;
     this.#content = content;
     this.#isImage = isImage;
     this.#hasActivated = false;
@@ -173,9 +173,9 @@ class LorAnimationChar {
       return;
     }
 
-    document.getElementById(this.#frontId)?.classList.add(IS_ACTIVE_STYLE);
-    document.getElementById(this.#shadowId)?.classList.add(IS_ACTIVE_STYLE);
+    document.getElementById(this.#id)?.classList.add(IS_ACTIVE_STYLE);
     this.#hasActivated = true;
+    this.#owner.onActivated();
   }
 }
 
@@ -238,16 +238,23 @@ class LorAnimationComment {
    * 現在の状態に基づいて HTML ソースコードをリフレッシュします。
    */
   refreshContent() {
-    let front = "";
-    let shadow = "";
+    let content = "";
     this.#characters.forEach((c) => {
       const isActiveStyle = c.hasActivated ? IS_ACTIVE_STYLE : "";
       const isImageStyle = c.isImage ? HIDDEN_STYLE : "";
-      front += `<span id="${c.frontId}" class="${TYPING_BLOCK_STYLE} ${isActiveStyle}">${c.content}</span>`;
-      shadow += `<span id="${c.shadowId}" class="${TYPING_BLOCK_STYLE} ${isImageStyle} ${isActiveStyle}">${c.content}</span>`;
+      content += `<div id="${c.id}" class="${TYPING_BLOCK_STYLE} ${isActiveStyle}">` +
+        `<span class="comment-text-front">${c.content}</span>` +
+        `<span class="comment-text-shadow ${isImageStyle}">${c.content}</span>` +
+        `</div>`;
     });
+    this.animationContent = content;
+  }
 
-    this.animationContent = `<div class="comment-text-front">${front}</div>${shadow}</div>`;
+  /**
+   * コメント文字が全て表示されてアクティブ状態になった時に呼び出されます。
+   */
+  onActivated() {
+
   }
 
   /**
@@ -281,9 +288,9 @@ class LorAnimationComment {
 
     let comment = oneComment.data.comment;
     let position = 0; // 変数commentに対する文字の参照位置
-    while (comment.length >= position) {
+    while (comment.length > position) {
       const char = comment.charAt(position);
-      const idPrefix = `${commentId}-${characters.length}`;
+      const id = `${commentId}-${characters.length}`;
 
       // Note:
       // 参照した文字charが<img>要素の開始だった場合は<img>要素丸ごと1つ、それ以外はエスケープしたものをコメント文字として扱う。
@@ -296,16 +303,20 @@ class LorAnimationComment {
         const trimed = comment.substring(position);
         const matched = trimed.match(/^<img\s.+?>/g);
         if (matched != null) {
-          characters.push(new LorAnimationChar(`${idPrefix}-front`, `${idPrefix}-shadow`, matched[0], true));
           comment = trimed.substring(matched[0].length);
           position = 0;
+
+          const isLast = comment.length == 0;
+          characters.push(new LorAnimationChar(this, id, matched[0], true));
           continue;
         }
       }
 
-      const escaped = this.#escape(char);
-      characters.push(new LorAnimationChar(`${idPrefix}-front`, `${idPrefix}-shadow`, escaped, false));
       position++;
+
+      const escaped = this.#escape(char);
+      const isLast = comment.length <= position;
+      characters.push(new LorAnimationChar(this, id, escaped, false));
     }
 
     return characters;
@@ -393,8 +404,10 @@ class LorAnimator {
 
       const char = this.#typingQueue.shift();
       if (char == null) {
+        this.#stopTypingAnimation();
         return;
       }
+      
       char.activate();
     }, DELAY_MILLISECONDS);
   }
