@@ -9,7 +9,7 @@
   "env": {
     "es6": true,
     "browser": true,
-    "node": false
+    "node": true
   },
   "rules": {
     "no-var": "error",
@@ -22,6 +22,7 @@
   "globals": {
     "Vue": "readonly",
     "OneSDK": "readonly",
-    "html": "readonly" // html-escaperをimportせずに使用する
+    "html": "readonly", // html-escaperをimportせずに使用する
+    "runes": "readonly"
   }
 }

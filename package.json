@@ -1,11 +1,13 @@
 {
   "private": true,
   "devDependencies": {
+    "@types/runes": "^0.4.1",
     "eslint": "^8.37.0",
     "eslint-config-prettier": "^8.8.0",
     "eslint-plugin-security": "^1.7.1",
     "html-escaper": "^3.0.3",
-    "prettier": "^2.8.7"
+    "prettier": "^2.8.7",
+    "runes": "^0.4.3"
   },
   "scripts": {
     "deploy": "powershell -NoProfile -ExecutionPolicy Unrestricted \".\\scripts\\deploy.ps1\""
