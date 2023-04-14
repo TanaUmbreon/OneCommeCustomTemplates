@@ -1,5 +1,8 @@
 /** @typedef {import("../types/onesdk").BaseComment} BaseComment */
 /** @typedef {import("../types/onesdk").CommonData} CommonData */
+
+//const runes = require("./runes");
+
 /**
  * @callback escape 指定した文字列に含まれる HTML エンティティ (`&`, `<`, `>`, `"`, `'`) を参照文字にエスケープして返します。
  * @param {string} es エスケープする対象の文字列。
@@ -283,14 +286,15 @@ class LorAnimationComment {
    */
   #buildCharacters(oneComment) {
     /** @type {LorAnimationChar[]} */
-    const characters = [];
-    const commentId = oneComment.data.id;
+    const lorCommentChars = [];
 
-    let comment = oneComment.data.comment;
-    let position = 0; // 変数commentに対する文字の参照位置
-    while (comment.length > position) {
-      const char = comment.charAt(position);
-      const id = `${commentId}-${characters.length}`;
+    /** @type {string[]} */
+    let oneCommentChars = runes(oneComment.data.comment);
+    let position = 0; // 変数charactersに対する文字の参照位置
+    while (oneCommentChars.length > position) {
+      // eslint-disable-next-line security/detect-object-injection
+      const char = oneCommentChars[position];
+      const id = `${oneComment.data.id}-${lorCommentChars.length}`;
 
       // Note:
       // 参照した文字charが<img>要素の開始だった場合は<img>要素丸ごと1つ、それ以外はエスケープしたものをコメント文字として扱う。
@@ -300,14 +304,14 @@ class LorAnimationComment {
       // <img>要素となった時点で初めて、comment変数を先頭から参照位置まで切り落とし、
       // <img>要素の部分を取得してLorAnimationCharを作成し、その後<img>要素の部分もcomment変数から切り落とす。
       if (char == "<") {
-        const trimed = comment.substring(position);
-        const matched = trimed.match(/^<img\s.+?>/g);
-        if (matched != null) {
-          comment = trimed.substring(matched[0].length);
+        const slicedComment = oneCommentChars.slice(position).join("");
+        const imgMatched = slicedComment.match(/^<img\s.+?>/g);
+        if (imgMatched != null) {
+          const imgLength = runes(imgMatched[0]).length;
+          oneCommentChars = oneCommentChars.slice(position + imgLength);
           position = 0;
 
-          const isLast = comment.length == 0;
-          characters.push(new LorAnimationChar(this, id, matched[0], true));
+          lorCommentChars.push(new LorAnimationChar(this, id, imgMatched[0], true));
           continue;
         }
       }
@@ -315,11 +319,10 @@ class LorAnimationComment {
       position++;
 
       const escaped = this.#escape(char);
-      const isLast = comment.length <= position;
-      characters.push(new LorAnimationChar(this, id, escaped, false));
+      lorCommentChars.push(new LorAnimationChar(this, id, escaped, false));
     }
 
-    return characters;
+    return lorCommentChars;
   }
 
   /**

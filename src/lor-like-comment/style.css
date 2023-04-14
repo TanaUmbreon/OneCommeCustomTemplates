@@ -22,23 +22,11 @@
   text-shadow: 0 0 0.15em var(--lor-like-comment-stroke-fore-color);
   -webkit-text-stroke: 0.1em var(--lor-like-comment-stroke-back-color);
   text-align: center;
+  transition: opacity 2s;
+  opacity: 1;
 }
 .comment-text-front {
   position: absolute;
-  text-shadow: none;
-  -webkit-text-stroke: 0 transparent;
-}
-.paid-text {
-  position: relative;
-  color: var(--lor-like-comment-color);
-  font-family: var(--lor-like-comment-font-family);
-  font-size: 0.5rem;
-  text-shadow: 0 0 0.15em var(--lor-like-comment-stroke-fore-color);
-  -webkit-text-stroke: 0.1em var(--lor-like-comment-stroke-back-color);
-}
-.paid-text::before {
-  position: absolute;
-  content: attr(data-text);
   text-shadow: none;
   -webkit-text-stroke: 0 transparent;
 }
