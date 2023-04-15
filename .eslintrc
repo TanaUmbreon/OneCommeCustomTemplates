@@ -16,8 +16,7 @@
     "no-unused-vars": "warn",
     "no-extra-semi": "error",
     "semi": ["error", "always"],
-    "no-unreachable":"error",
-    "no-restricted-imports": ["error", { "patterns": ["*"] }] // わんコメで非対応のため禁止
+    "no-unreachable":"error"
   },
   "globals": {
     "Vue": "readonly",
