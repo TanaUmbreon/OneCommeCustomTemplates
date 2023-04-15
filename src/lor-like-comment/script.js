@@ -1,7 +1,7 @@
 /** @typedef {import("../types/onesdk").BaseComment} BaseComment */
 /** @typedef {import("../types/onesdk").CommonData} CommonData */
 
-//const runes = require("./runes");
+import {  } from "../__modules/runes/index.js";
 import { Position } from "../__modules/Position.js";
 import { Random} from "../__modules/Random.js";
 

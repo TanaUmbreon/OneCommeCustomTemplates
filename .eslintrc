@@ -21,7 +21,6 @@
   "globals": {
     "Vue": "readonly",
     "OneSDK": "readonly",
-    "html": "readonly", // html-escaperをimportせずに使用する
-    "runes": "readonly"
+    "html": "readonly" // html-escaperをimportせずに使用する
   }
 }
