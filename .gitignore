@@ -19,3 +19,7 @@ slim
 word-party-preset
 yurucamp
 yurucamp-right
+
+# ビルド時に作成されるフォルダー
+debug
+dist

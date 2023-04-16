@@ -1,8 +1,9 @@
-/** パス操作を行う Node.js のモジュール */
+/** パス操作を行う Node.js の組み込みモジュール */
 const path = require("path");
 
 module.exports = {
-  mode: "production",
+  // modeの指定はコマンド引数から行う
+  // mode: "production",
   optimization: {
     minimize: false,
   },
@@ -10,7 +11,7 @@ module.exports = {
     lor: "./src/lor-like-comment/script.js",
   },
   output: {
-    path: path.resolve(__dirname, "release"),
+    path: path.resolve(__dirname, "dist/templates"),
     filename: "script.js",
   },
 };

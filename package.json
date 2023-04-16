@@ -13,7 +13,7 @@
     "webpack-cli": "^5.0.1"
   },
   "scripts": {
-    "build": ".\\scripts\\build.bat",
-    "deploy": "powershell -NoProfile -ExecutionPolicy Unrestricted \".\\scripts\\deploy.ps1\""
+    "deploy": ".\\scripts\\deploy.bat",
+    "release": ".\\scripts\\release.bat"
   }
 }
