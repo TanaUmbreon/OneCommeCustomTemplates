@@ -6,55 +6,21 @@
 
 このテンプレートやソースコードの使用により発生した問題等は、いかなる理由があっても一切責任を負いません。
 
-## テンプレートを利用する方へ
-
-### 利用するための前提条件
+## 利用するための前提条件
 
 - **※必須※**
-  - 「わんコメ」がPCにインストールされていること。
+  - 「[わんコメ](https://onecomme.com/)」がPCにインストールされていること。
 - **※任意※**
-  - 「[ロゴたいぷゴシック](http://www.fontna.com/blog/1226/)」がPCにインストールされていること。「Library Of Ruina」で使われているフォントに似せるために使用しますが、インストールされていなくても他のフォントで代用できます。
+  - 「[ロゴたいぷゴシック](http://www.fontna.com/blog/1226/)」がPCにインストールされていること。「Library Of Ruina」で使われているフォントに似せるために使用しますが、インストールされていなくても他の標準フォントで表示されます。
 
-### テンプレートのダウンロード方法
+## テンプレートの利用方法
 
-~~[「Releases」ページ](https://github.com/TanaUmbreon/OneCommeCustomTemplates/releases)を参照してください。~~ (未完成のためダウンロードできません)
+~~こちらの [配布ページ] からテンプレートのZIPファイルをダウンロードしてください。その後の手順は、ZIPファイルの中に付属している `README.txt` をメモ帳で開いてご確認ください。~~ (未完成のためダウンロードできません)
 
-## テンプレートを開発する方へ
+## ライセンス情報
 
-### 開発するための前提条件
+このテンプレートおよびソースコードは [MITライセンス](https://github.com/TanaUmbreon/OneCommeCustomTemplates/LICENSE) で公開しています。
 
-「[利用するための前提条件](#利用するための前提条件)」に加え、以下の条件が必要となります。
+## テンプレートを開発する方への情報
 
-- 「[Visual Studio Code](https://code.visualstudio.com/)」(以下、「VSCode」)がPCにインストールされていて、かつ拡張機能の「ESLint」と「Prettier - Code formatter」が「VSCode」にインストールされていること。開発エディタとして使用します。
-- 「[Node.js](https://nodejs.org/ja)」がPCにインストールされていて、かつ「Node.js」の「npm」コマンドがターミナルやコマンドプロンプト等(以下、「ターミナル」)で使用できるようパスが通っていること。開発を補助するツールやライブラリーをセットアップし、使用できるようにします。
-
-### 開発環境の構築手順
-
-1. 「GitHub」から [TanaUmbreon/OneCommeCustomTemplatesリポジトリ](https://github.com/TanaUmbreon/OneCommeCustomTemplates) をクローンします。以下、クローン先として指定したソースコードが配置されたフォルダーを「作業フォルダー」と呼びます。
-2. 「VSCode」を起動し、「ファイル」→「フォルダーを開く」メニューから「作業フォルダー」を選択して開きます。
-3. 「VSCode」でCtrl+@キーを押し、「ターミナル」を表示させます。
-4. 「ターミナル」でコマンド `npm run setup` を入力して実行します。
-
-### 定義済みスクリプトコマンド
-
-`npm run setup`
-
-- 「わんコメ」の「テンプレートフォルダ」にある `__origin\` フォルダーを、「作業フォルダー」の `templates\` フォルダー直下にコピペする。
-- 「ターミナル」で「作業フォルダー」からコマンド `npm install` を実行する。開発で使う「Node.js」のライブラリーが「作業フォルダー」にインストールされる。
-
-`npm run deploy`
-
-`npm run build`
-
-### 使用しているNode.jsのライブラリ
-
-- `ESLint` ※開発環境のみ
-  - プラグイン
-    - [eslint-plugin-security](https://github.com/eslint-community/eslint-plugin-security)
-  - 設定
-    - [eslint-config-prettier](https://github.com/prettier/eslint-config-prettier)
-- `Prettier` ※開発環境のみ
-
-## ライセンス
-
-このソースコードはMITライセンスで公開しています。
+こちらの [`README-DEVELOPER.md`](https://github.com/TanaUmbreon/OneCommeCustomTemplates/README-DEVELOPER.md) をご確認ください。
