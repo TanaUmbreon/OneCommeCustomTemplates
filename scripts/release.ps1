@@ -8,23 +8,49 @@ using namespace System.IO
 # このスクリプトの動作条件は、プロジェクトのルートフォルダーを基準として
 # ".\scripts\" フォルダーにこのファイルが配置されている事を前提としています。
 function Main() {
-    $WebpackPath = New-Object FileInfo([Path]::Combine($PSScriptRoot, "..\node_modules\.bin\webpack"))
+    $RootDirPath = (New-Object DirectoryInfo([Path]::Combine($PSScriptRoot, "..\"))).FullName
 
-    if (-not $WebpackPath.Exists) {
-        throw $WEBPACK_NOT_INSTALLED
+    $WebpackMode = "production"
+    $OutputDirPath = [Path]::Combine($RootDirPath, "dist\")
+    $SrcDirPath = [Path]::Combine($RootDirPath, "src\")
+    $WebpackCommandPath =[Path]::Combine($RootDirPath, "node_modules\.bin\webpack")
+
+    if (-not [File]::Exists($WebpackCommandPath)) { throw $WEBPACK_NOT_INSTALLED }
+    if (-not [Directory]::Exists($SrcDirPath)) { throw $SOURCE_DIRECTORY_NOT_FOUND }
+
+    if ([Directory]::Exists($OutputDirPath)) { [Directory]::Delete($OutputDirPath, $True) }
+
+    Start-Process -Wait -FilePath "$WebpackCommandPath" -ArgumentList ("--mode", $WebpackMode)
+    Copy-Files $RootDirPath $OutputDirPath "README.txt"
+    Copy-Files ([Path]::Combine($SrcDirPath, "lor-like-comment\")) `
+               ([Path]::Combine($OutputDirPath, "templates\lor-like-comment\"))
+}
+
+# .Description
+# 指定したフォルダ直下にあるファイルを指定したフォルダ直下に上書きコピーします。
+# jsファイルはコピーから除外されます。
+function Copy-Files($fromDirPath, $toDirPath, $filter = "*.*") {
+    $fromDir = New-Object DirectoryInfo($fromDirPath)
+    $toDir = New-Object DirectoryInfo($toDirPath)
+
+    if (-not $toDir.Exists) { $toDir.Create }
+
+    foreach ($fromFile in $fromDir.EnumerateFiles($filter)) {
+        if ($fromFile.Extension -eq ".js") { continue }
+
+        $fromFile.CopyTo([Path]::Combine($toDir.FullName, $fromFile.Name), $True)|Out-Null
     }
-
-    Start-Process -FilePath $WebpackPath
 }
 
 # .Description
 # このスクリプト内で参照できる定数を宣言します。
 function Declare-ScriptScopedConstants() {
     New-Variable -Scope script -Option ReadOnly -Name WEBPACK_NOT_INSTALLED -Value "webpack が node_modules にインストールされていません。`nプロジェクトのルートフォルダーで 'npm install' を実行してください。"
+    New-Variable -Scope script -Option ReadOnly -Name SOURCE_DIRECTORY_NOT_FOUND -Value "src フォルダーが見つかりません。"
 
-    New-Variable -Scope script -Option ReadOnly -Name SCRIPT_BEGIN -Value "ビルドを開始します。"
-    New-Variable -Scope script -Option ReadOnly -Name SCRIPT_COMPLETED -Value "ビルドが完了しました。"
-    New-Variable -Scope script -Option ReadOnly -Name SCRIPT_STOPPED -Value "問題が発生したためビルドを停止しました。`n{0}"
+    New-Variable -Scope script -Option ReadOnly -Name SCRIPT_BEGIN -Value "リリースビルドを開始します。"
+    New-Variable -Scope script -Option ReadOnly -Name SCRIPT_COMPLETED -Value "リリースビルドが完了しました。"
+    New-Variable -Scope script -Option ReadOnly -Name SCRIPT_STOPPED -Value "問題が発生したためリリースビルドを停止しました。`n{0}"
 }
 
 try {

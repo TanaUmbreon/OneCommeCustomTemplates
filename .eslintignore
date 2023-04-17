@@ -22,5 +22,6 @@
 ## オープンソースライブラリ
 **/__modules/runes/*
 
-## webpack後のリリースフォルダー
-release/*
+## webpack実行により作成される出力フォルダ
+deploy/*
+dist/*
