@@ -2,45 +2,52 @@
 
 using namespace System
 using namespace System.IO
-using namespace System.Text.RegularExpressions
 
 # .Description
 # このプロジェクトのソースコードを「わんコメ」の「テンプレートフォルダ」にデプロイして使用できるようにします。
 # ESLintによりLINTエラーが発生している場合はデプロイを行いません。
 # また、その他の理由でエラーとなる場合もデプロイを行いません。
+# このスクリプトの動作条件は、プロジェクトのルートフォルダーを基準として
+# ".\scripts\" フォルダーにこのファイルが配置されている事を前提としています。
 function Main() {
-    try {
-        # デプロイ先となる「テンプレートフォルダ」のパス
-        $templateDirPath = [Path]::Combine($env:APPDATA, "live-comment-viewer\templates")
-        # プロジェクトのルートフォルダーのパス
-        $rootDirPath = [Environment]::CurrentDirectory
-        # ソースコードフォルダーのパス
-        $srcDirPath = [Path]::Combine($rootDirPath, "src")
-        # デプロイから除外するフォルダーの名前(正規表現パターンで指定)
-        $excludesDirNamePattern = "^(types|__origin|__pro|basic|cool-pop|flipboard|ktx-quick-starter|line|line-right|neon|newsticker|persona|persona-right|retro|slim|word-party-preset|yurucamp|yurucamp-right)$"
+    # プロジェクトのルートフォルダーのパス
+    $RootDirPath = (New-Object DirectoryInfo([Path]::Combine($PSScriptRoot, "..\"))).FullName
 
-        ThrowIf-DirectoryNotFound $templateDirPath ([String]::Format($TEMPLATE_DIRECTORY_NOT_FOUND, $templateDirPath))
-        ThrowIf-DirectoryNotFound $srcDirPath ([String]::Format($SOURCE_DIRECTORY_NOT_FOUND, $srcDirPath))
-        ThrowIf-EslintProblemOccurred $srcDirPath
+    # webpackの実行モード
+    $WebpackMode = "development"
+    # webpackの出力先フォルダーのパス
+    $OutputDirPath = [Path]::Combine($RootDirPath, "debug\")
+    # srcフォルダーのパス
+    $SrcDirPath = [Path]::Combine($RootDirPath, "src\")
+    # webpackコマンドのパス
+    $WebpackCommandPath =[Path]::Combine($RootDirPath, "node_modules\.bin\webpack")
+    # デプロイ先となる「テンプレートフォルダ」のパス
+    $TemplateDirPath = [Path]::Combine($env:APPDATA, "live-comment-viewer\templates\")
 
-        $srcDir = New-Object DirectoryInfo($srcDirPath)
-        foreach ($fromDir in $srcDir.EnumerateDirectories()) {
-            if ([Regex]::IsMatch($fromDir.Name, $excludesDirNamePattern, [RegexOptions]::IgnoreCase)) { continue }
-            
-            $toDir = New-Object DirectoryInfo([Path]::Combine($templateDirPath, $fromDir))
-            
-            if ($toDir.Exists) {
-                $toDir.Delete($true)
-            }
-            Copy-Item -Recurse $fromDir.FullName $toDir.FullName
+    if (-not [File]::Exists($WebpackCommandPath)) { throw $WEBPACK_NOT_INSTALLED }
+    ThrowIf-DirectoryNotFound $SrcDirPath ([String]::Format($SOURCE_DIRECTORY_NOT_FOUND, $srcDirPath))
+    ThrowIf-DirectoryNotFound $TemplateDirPath ([String]::Format($TEMPLATE_DIRECTORY_NOT_FOUND, $templateDirPath))
+    ThrowIf-EslintProblemOccurred $SrcDirPath
 
-            Write-Host ([String]::Format($TEMPLATE_REPLACED, $fromDir.Name))
+    if ([Directory]::Exists($OutputDirPath)) { [Directory]::Delete($OutputDirPath, $True) }
+
+    Start-Process -Wait -FilePath "$WebpackCommandPath" -ArgumentList ("--mode", $WebpackMode)
+    Copy-Files ([Path]::Combine($SrcDirPath, "lor-like-comment\")) `
+               ([Path]::Combine($OutputDirPath, "lor-like-comment\"))
+
+    $OutputDir = New-Object DirectoryInfo($OutputDirPath)
+    foreach ($FromDir in $OutputDir.EnumerateDirectories()) {
+        $ToDir = New-Object DirectoryInfo([Path]::Combine($TemplateDirPath, $FromDir.Name))
+        
+        if ($ToDir.Exists) {
+            $ToDir.Delete($true)
         }
+        Copy-Item -Recurse $FromDir.FullName $ToDir.FullName
 
-        Write-Host $DEPLOY_COMPLETED
-    } catch {
-        Write-Host -ForegroundColor Red ([String]::Format($DEPLOY_STOPPED, $_))
+        Write-Host ([String]::Format($TEMPLATE_REPLACED, $FromDir.Name))
     }
+
+    Write-Host $DEPLOY_COMPLETED
 }
 
 # .Description
@@ -61,25 +68,45 @@ function ThrowIf-EslintProblemOccurred($path) {
 }
 
 # .Description
+# 指定したフォルダ直下にあるファイルを指定したフォルダ直下に上書きコピーします。
+# jsファイルはコピーから除外されます。
+function Copy-Files($fromDirPath, $toDirPath, $filter = "*.*") {
+    $fromDir = New-Object DirectoryInfo($fromDirPath)
+    $toDir = New-Object DirectoryInfo($toDirPath)
+
+    if (-not $toDir.Exists) { $toDir.Create }
+
+    foreach ($fromFile in $fromDir.EnumerateFiles($filter)) {
+        if ($fromFile.Extension -eq ".js") { continue }
+
+        $fromFile.CopyTo([Path]::Combine($toDir.FullName, $fromFile.Name), $True)|Out-Null
+    }
+}
+
+# .Description
 # このスクリプト内で参照できる定数を宣言します。
 function Declare-ScriptScopedConstants() {
-    New-Variable -Scope script -Name DEPLOY_BEGIN -Value "デプロイを開始します。"
-    New-Variable -Scope script -Name DEPLOY_COMPLETED -Value "デプロイが完了しました。"
-    New-Variable -Scope script -Name TEMPLATE_REPLACED -Value "テンプレート '{0}' を配置しました。"
-    New-Variable -Scope script -Name SOURCE_DIRECTORY_NOT_FOUND -Value "ソースコードフォルダー '{0}' が見つかりません。"
-    New-Variable -Scope script -Name ESLINT_ERROR -Value "ESLintによるチェックでエラーがありました。"
-    New-Variable -Scope script -Name TEMPLATE_DIRECTORY_NOT_FOUND -Value @"
+    New-Variable -Scope script -Option ReadOnly -Name SCRIPT_BEGIN -Value "デプロイを開始します。"
+    New-Variable -Scope script -Option ReadOnly -Name SCRIPT_COMPLETED -Value "デプロイが完了しました。"
+    New-Variable -Scope script -Option ReadOnly -Name SCRIPT_STOPPED -Value "問題が発生したためデプロイを停止しました。`n{0}"
+
+    New-Variable -Scope script -Option ReadOnly -Name TEMPLATE_REPLACED -Value "テンプレート '{0}' を配置しました。"
+    New-Variable -Scope script -Option ReadOnly -Name SOURCE_DIRECTORY_NOT_FOUND -Value "ソースコードフォルダー '{0}' が見つかりません。"
+    New-Variable -Scope script -Option ReadOnly -Name ESLINT_ERROR -Value "ESLintによるチェックでエラーがありました。"
+    New-Variable -Scope script -Option ReadOnly -Name TEMPLATE_DIRECTORY_NOT_FOUND -Value @"
 「わんコメ」の「テンプレートフォルダ」が見つかりません。以下の確認をしてください。
 1. 「わんコメ」がPCにインストールされている。
 2. 「テンプレートフォルダ」の場所が '{0}' になっている。
 3. このデプロイスクリプトで指定している「テンプレートフォルダ」のパスが「わんコメ」のデフォルトのインストール先になっている。
 "@
-    New-Variable -Scope script -Name DEPLOY_STOPPED -Value @"
-問題が発生したためデプロイを中止しました。
-{0}
-"@
 }
 
-Declare-ScriptScopedConstants
-Write-Host $DEPLOY_BEGIN
-Main
+try {
+    Declare-ScriptScopedConstants
+
+    Write-Host $SCRIPT_BEGIN
+    Main
+    Write-Host $SCRIPT_COMPLETED
+} catch {
+    Write-Host -ForegroundColor Red ([String]::Format($SCRIPT_STOPPED, ($error[0] | Out-string)))
+}
