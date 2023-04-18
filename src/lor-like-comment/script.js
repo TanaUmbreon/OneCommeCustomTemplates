@@ -3,8 +3,8 @@
 
 import { Position } from "../__modules/Position.js";
 import { Random} from "../__modules/Random.js";
+import { escape } from "../__modules/Escaper.js";
 const runes = require("runes");
-const html = require("html-escaper");
 
 /**
  * @callback escape 指定した文字列に含まれる HTML エンティティ (`&`, `<`, `>`, `"`, `'`) を参照文字にエスケープして返します。
@@ -242,22 +242,11 @@ class LorAnimationComment {
 
       position++;
 
-      const escaped = this.#escape(char);
+      const escaped = escape(char);
       lorCommentChars.push(new LorAnimationChar(this, id, escaped, false));
     }
 
     return lorCommentChars;
-  }
-
-  /**
-   * 指定した文字列に含まれる HTML エンティティ (`&`, `<`, `>`, `"`, `'`) と半角スペースを参照文字にエスケープして返します。
-   * @param {string} text エスケープ対象の文字列。
-   * @returns {string} 参照文字にエスケープされた text と同等の文字列。
-   */
-  #escape(text) {
-    /** @type {string} */
-    const escaped = html.escape(text);
-    return escaped.replace(" ", "&nbsp;");
   }
 }
 
