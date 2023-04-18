@@ -3,6 +3,7 @@
 
 import { Position } from "../__modules/Position.js";
 import { Random} from "../__modules/Random.js";
+import { LorAnimationChar } from "../__modules/LorAnimationChar.js";
 import { escape } from "../__modules/Escaper.js";
 const runes = require("runes");
 
@@ -28,83 +29,9 @@ const COMMENT_OFFSET_MAX = 50;
 /** @type {number} コメントの次の文字を表示する間隔[ミリ秒] */
 const DELAY_MILLISECONDS = 150;
 
-/** @type {string} コメントの単一文字が表示状態になっている事を表すクラス名 */
-const IS_ACTIVE_STYLE = "is-active";
-/** @type {string} コメントの単一文字のブロックを表すクラス名 */
-const TYPING_BLOCK_STYLE = "typing-block";
-/** @type {string} 表示領域だけ確保して非表示にするコメントの単一文字を表すクラス名 */
-const HIDDEN_STYLE = "hidden";
 
 /** @type {number} コメントが完全に表示されてからフェードアウトが始まるまでの時間[ミリ秒] */
 const COMMENT_DISPLAY_MILLISECONDS = 10000;
-
-/**
- * LoR (Library Of Ruina) 風アニメーションを行うコメント本文の単一の文字を表します。
- */
-class LorAnimationChar {
-  /** @type {LorAnimationComment} このコメント文字が含まれるコメント */
-  #owner;
-  /** @type {LorAnimationComment} このコメント文字が含まれるコメント */
-  get owner() {
-    return this.#owner;
-  }
-
-  /** @type {string} コメント文字の要素を特定する ID 名 */
-  #id;
-  /** @type {string} コメント文字の要素を特定する ID 名 */
-  get id() {
-    return this.#id;
-  }
-
-  /** @type {string} コメント文字を表す HTML 要素のコンテンツ */
-  #content;
-  /** @type {string} コメント文字を表す HTML 要素のコンテンツ */
-  get content() {
-    return this.#content;
-  }
-
-  /** @type {boolean} 文字の代わりに img 要素を用いている事を示す値 */
-  #isImage;
-  /** @type {boolean} 文字の代わりに img 要素を用いている事を示す値 */
-  get isImage() {
-    return this.#isImage;
-  }
-
-  /** @type {boolean} この文字をアクティブ化してタイピングアニメーションを行った事を示す値 */
-  #hasActivated;
-  /** @type {boolean} この文字をアクティブ化してタイピングアニメーションを行った事を示す値 */
-  get hasActivated() {
-    return this.#hasActivated;
-  }
-
-  /**
-   * LorTypingChar のインスタンスを生成します。
-   * @param {LorAnimationComment} owner このコメント文字が含まれるコメント。
-   * @param {string} id コメント文字の要素を特定する ID 名。
-   * @param {string} content 文字を表す HTML 要素のコンテンツ。
-   * @param {boolean} isImage 文字の代わりに img 要素を用いている事を示す値。
-   */
-  constructor(owner, id, content, isImage) {
-    this.#owner = owner;
-    this.#id = id;
-    this.#content = content;
-    this.#isImage = isImage;
-    this.#hasActivated = false;
-  }
-
-  /**
-   * この文字をアクティブ化して、タイピングアニメーションを行います。
-   */
-  activate() {
-    if (this.#hasActivated) {
-      return;
-    }
-
-    document.getElementById(this.#id)?.classList.add(IS_ACTIVE_STYLE);
-    this.#hasActivated = true;
-    this.#owner.onActivated();
-  }
-}
 
 /**
  * LoR (Library Of Ruina) 風アニメーションを行う単一のコメントを表します。
@@ -167,12 +94,7 @@ class LorAnimationComment {
   refreshContent() {
     let content = "";
     this.#characters.forEach((c) => {
-      const isActiveStyle = c.hasActivated ? IS_ACTIVE_STYLE : "";
-      const isImageStyle = c.isImage ? HIDDEN_STYLE : "";
-      content += `<div id="${c.id}" class="${TYPING_BLOCK_STYLE} ${isActiveStyle}">` +
-        `<span class="comment-text-front">${c.content}</span>` +
-        `<span class="comment-text-shadow ${isImageStyle}">${c.content}</span>` +
-        `</div>`;
+      content += c.buildContent();
     });
     this.animationContent = content;
   }
