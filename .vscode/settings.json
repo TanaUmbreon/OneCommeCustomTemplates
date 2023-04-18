@@ -7,7 +7,9 @@
     "**/.DS_Store": true,
     "**/Thumbs.db": true,
     "**/node_modules": true,
-    "**/package-lock.json": true
+    "**/package-lock.json": true,
+    "**/debug": true,
+    "**/dist": true,
   },
 
   "eslint.enable": true,
