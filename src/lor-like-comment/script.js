@@ -1,5 +1,5 @@
-/** @typedef {import("../types/onesdk").BaseComment} BaseComment */
-/** @typedef {import("../types/onesdk").CommonData} CommonData */
+/** @typedef {import("../__types/onesdk").BaseComment} BaseComment */
+/** @typedef {import("../__types/onesdk").CommonData} CommonData */
 
 import { Position } from "../__modules/Position.js";
 import { Random} from "../__modules/Random.js";
