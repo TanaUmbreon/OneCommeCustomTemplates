@@ -1,15 +1,13 @@
+import { LorAnimator } from "../__modules/LorAnimator.js";
+
 /** @typedef {import("../__types/onesdk").BaseComment} BaseComment */
 /** @typedef {import("../__types/onesdk").CommonData} CommonData */
-
-import { LorAnimator } from "../__modules/LorAnimator.js";
+/** @typedef {import("../__modules/LorAnimationComment").LorAnimationComment} LorAnimationComment */
 
 const JSON_PATH = "../../comment.json";
 
 /** @type {number} 画面に表示するコメントの最大数 */
-const LIMIT = 5;
-
-/** @type {number} コメントが完全に表示されてからフェードアウトが始まるまでの時間[ミリ秒] */
-const COMMENT_DISPLAY_MILLISECONDS = 10000;
+const LIMIT = 10;
 
 /** @type {LorAnimator} LoR 風アニメーションの制御オブジェクト */
 const animator = new LorAnimator();

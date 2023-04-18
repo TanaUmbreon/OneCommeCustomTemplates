@@ -5,6 +5,9 @@ import { LorAnimationComment } from "../__modules/LorAnimationComment.js";
 /** @type {number} コメントの次の文字を表示する間隔[ミリ秒] */
 const DELAY_MILLISECONDS = 150;
 
+/** @type {number} コメントが完全に表示されてからフェードアウトが始まるまでの時間[ミリ秒] */
+const COMMENT_DISPLAY_MILLISECONDS = 10000;
+
 /**
  * LoR (Library Of Ruina) 風アニメーションを制御します。
  */
