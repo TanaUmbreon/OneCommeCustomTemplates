@@ -19,9 +19,6 @@
 **/yurucamp/*
 **/yurucamp-right/*
 
-## オープンソースライブラリ
-**/__modules/runes/*
-
 ## webpack実行により作成される出力フォルダ
 deploy/*
-dist/*
+debug/*
