@@ -1,12 +1,13 @@
-import { LorAnimationComment } from "../__modules/LorAnimationComment.js";
+import { LorAnimationComment } from "./LorAnimationComment.js";
 
 /** @typedef {import("../__types/onesdk").CommonData} CommonData */
+/** @typedef {import("../__modules/LorAnimationChar").LorAnimationChar} LorAnimationChar */
 
 /** @type {number} コメントの次の文字を表示する間隔[ミリ秒] */
 const DELAY_MILLISECONDS = 150;
 
 /** @type {number} コメントが完全に表示されてからフェードアウトが始まるまでの時間[ミリ秒] */
-const COMMENT_DISPLAY_MILLISECONDS = 10000;
+const COMMENT_DISPLAY_MILLISECONDS = 8000;
 
 /**
  * LoR (Library Of Ruina) 風アニメーションを制御します。
@@ -83,6 +84,11 @@ export class LorAnimator {
       }
       
       char.activate();
+      if (!char.isLast) { return; }
+
+      setTimeout(() => {
+        char.owner.deactivation();
+      }, COMMENT_DISPLAY_MILLISECONDS);
     }, DELAY_MILLISECONDS);
   }
 

@@ -28,7 +28,11 @@ const app = Vue.createApp({
      * @returns {string} コメントブロックに対して設定するクラス名。
      */
     getClassName(comment) {
-      return comment.commentIndex % 2 === 0 ? "comment even" : "comment odd";
+      let className = comment.commentIndex % 2 === 0 ? "comment even" : "comment odd";
+      if (comment.hasDeactivated) {
+        className += " is-deactive";
+      }
+      return className;
     },
     /**
      * 指定した LoR 風コメントのコメントブロックに適用するスタイル情報を取得します。

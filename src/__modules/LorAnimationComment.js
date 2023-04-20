@@ -4,6 +4,9 @@ import { LorAnimationChar } from "./LorAnimationChar.js";
 import { escape } from "./Escaper.js";
 const runes = require("runes");
 
+/** @typedef {import("../__types/onesdk").BaseComment} BaseComment */
+/** @typedef {import("../__types/onesdk").CommonData} CommonData */
+
 /** @type {number} コメントの回転角度の最小値[度] */
 const COMMENT_ROTATE_MIN = -30;
 /** @type {number} コメントの回転角度の最大値[度] */
@@ -12,6 +15,9 @@ const COMMENT_ROTATE_MAX = 30;
 const COMMENT_OFFSET_MIN = 5;
 /** @type {number} コメントを表示する位置の最大値[vw, vh] */
 const COMMENT_OFFSET_MAX = 50;
+
+/** @type {string} コメントが非表示状態になっている事を表すクラス名 */
+const IS_DEACTIVE_STYLE = "is-deactive";
 
 /**
  * LoR (Library Of Ruina) 風アニメーションを行う単一のコメントを表します。
@@ -40,6 +46,8 @@ export class LorAnimationComment {
   animationContent;
   /** @type {string} 読み上げ用のコメント本文として使用する HTML ソースコード */
   speechContent;
+  /** @type {boolean} このコメントを非アクティブ化してフェードアウトアニメーションを行った事を示す値 */
+  hasDeactivated;
 
   /** @type {LorAnimationChar[]} LoR 風アニメーションを行うコメント文字のリスト */
   #characters;
@@ -58,6 +66,7 @@ export class LorAnimationComment {
     this.name = oneComment.name;
     this.data = oneComment.data;
     this.commentIndex = oneComment.commentIndex;
+    this.hasDeactivated = false;
 
     this.style = this.#buildStyle();
     this.#characters = this.#buildCharacters(oneComment);
@@ -80,10 +89,15 @@ export class LorAnimationComment {
   }
 
   /**
-   * コメント文字が全て表示されてアクティブ状態になった時に呼び出されます。
+   * このコメントを非アクティブ化して、フェードアウトを行います。
    */
-  onActivated() {
+  deactivation() {
+    if (this.hasDeactivated) {
+      return;
+    }
 
+    document.getElementById(this.data.id)?.classList.add(IS_DEACTIVE_STYLE);
+    this.hasDeactivated = true;
   }
 
   /**
@@ -116,11 +130,13 @@ export class LorAnimationComment {
 
     /** @type {string[]} */
     let oneCommentChars = runes(oneComment.data.comment);
-    let position = 0; // 変数charactersに対する文字の参照位置
+    /** 変数charactersに対する文字の参照位置 */
+    let position = 0;
     while (oneCommentChars.length > position) {
       // eslint-disable-next-line security/detect-object-injection
       const char = oneCommentChars[position];
       const id = `${oneComment.data.id}-${lorCommentChars.length}`;
+      const isLast = (oneCommentChars.length - 1) <= position;
 
       // Note:
       // 参照した文字charが<img>要素の開始だった場合は<img>要素丸ごと1つ、それ以外はエスケープしたものをコメント文字として扱う。
@@ -137,7 +153,7 @@ export class LorAnimationComment {
           oneCommentChars = oneCommentChars.slice(position + imgLength);
           position = 0;
 
-          lorCommentChars.push(new LorAnimationChar(this, id, imgMatched[0], true));
+          lorCommentChars.push(new LorAnimationChar(this, id, imgMatched[0], isLast));
           continue;
         }
       }
@@ -145,7 +161,7 @@ export class LorAnimationComment {
       position++;
 
       const escaped = escape(char);
-      lorCommentChars.push(new LorAnimationChar(this, id, escaped, false));
+      lorCommentChars.push(new LorAnimationChar(this, id, escaped, isLast));
     }
 
     return lorCommentChars;

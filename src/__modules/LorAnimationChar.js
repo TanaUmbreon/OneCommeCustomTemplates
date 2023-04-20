@@ -9,29 +9,39 @@ const HIDDEN_STYLE = "hidden";
  * LoR (Library Of Ruina) 風アニメーションを行うコメント本文の単一の文字を表します。
  */
 export class LorAnimationChar {
-  /** @type {LorAnimationComment} このコメント文字が含まれるコメント */
-  #owner;
   /** @type {string} コメント文字の要素を特定する ID 名 */
   #id;
   /** @type {string} コメント文字を表す HTML 要素のコンテンツ */
   #content;
-  /** @type {boolean} 文字の代わりに img 要素を用いている事を示す値 */
-  #isImage;
   /** @type {boolean} この文字をアクティブ化してタイピングアニメーションを行った事を示す値 */
   #hasActivated;
+
+  /** @type {LorAnimationComment} このコメント文字が含まれるコメント */
+  #owner;
+  /** @type {LorAnimationComment} このコメント文字が含まれるコメント */
+  get owner() {
+    return this.#owner;
+  }
+
+  /** @type {boolean} コメント文字列の最後の文字であることを示す値 */
+  #isLast;
+  /** @type {boolean} コメント文字列の最後の文字であることを示す値 */
+  get isLast() {
+    return this.#isLast;
+  }
 
   /**
    * LorTypingChar のインスタンスを生成します。
    * @param {LorAnimationComment} owner このコメント文字が含まれるコメント。
    * @param {string} id コメント文字の要素を特定する ID 名。
    * @param {string} content 文字を表す HTML 要素のコンテンツ。
-   * @param {boolean} isImage 文字の代わりに img 要素を用いている事を示す値。
+   * @param {boolean} isLast コメント文字列の最後の文字であることを示す値。
    */
-  constructor(owner, id, content, isImage) {
+  constructor(owner, id, content, isLast) {
     this.#owner = owner;
     this.#id = id;
     this.#content = content;
-    this.#isImage = isImage;
+    this.#isLast = isLast;
     this.#hasActivated = false;
   }
 
@@ -45,7 +55,6 @@ export class LorAnimationChar {
 
     document.getElementById(this.#id)?.classList.add(IS_ACTIVE_STYLE);
     this.#hasActivated = true;
-    this.#owner.onActivated();
   }
 
   buildContent() {

@@ -22,8 +22,6 @@
   text-shadow: 0 0 0.15em var(--lor-like-comment-stroke-fore-color);
   -webkit-text-stroke: 0.1em var(--lor-like-comment-stroke-back-color);
   text-align: center;
-  transition: opacity 2s;
-  opacity: 1;
 }
 .comment-text-front {
   position: absolute;
@@ -40,6 +38,14 @@
 }
 .hidden {
   visibility: hidden;
+}
+
+.comment {
+  opacity: 1;
+}
+.comment.is-deactive {
+  opacity: 0;
+  transition: opacity 2s;
 }
 
 /* 不要な要素を非表示にする */
