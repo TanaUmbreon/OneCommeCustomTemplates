@@ -1,9 +1,16 @@
+import { Random} from "./Random.js";
+
 /** @type {string} コメントの単一文字が表示状態になっている事を表すクラス名 */
 const IS_ACTIVE_STYLE = "is-active";
 /** @type {string} コメントの単一文字のブロックを表すクラス名 */
 const TYPING_BLOCK_STYLE = "typing-block";
 /** @type {string} 表示領域だけ確保して非表示にするコメントの単一文字を表すクラス名 */
 const HIDDEN_STYLE = "hidden";
+
+/** @type {number} 文字の回転角度の最小値[度] */
+const CHAR_ROTATE_MIN = -2;
+/** @type {number} 文字の回転角度の最小値[度] */
+const CHAR_ROTATE_MAX = 2;
 
 /**
  * LoR (Library Of Ruina) 風アニメーションを行うコメント本文の単一の文字を表します。
@@ -55,6 +62,15 @@ export class LorAnimationChar {
 
     document.getElementById(this.#id)?.classList.add(IS_ACTIVE_STYLE);
     this.#hasActivated = true;
+  }
+
+  /**
+   * この文字をランダムにわずかに傾かせ、小刻みに揺れるアニメーションを行います。
+   */
+  shake() {
+    const style = document.getElementById(this.#id)?.style;
+    if (style == null) { return; }
+    style.transform = `rotate(${Random.nextInt(CHAR_ROTATE_MIN, CHAR_ROTATE_MAX)}deg)`;
   }
 
   buildContent() {

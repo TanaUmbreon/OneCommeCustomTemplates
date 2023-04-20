@@ -6,6 +6,9 @@ import { LorAnimationComment } from "./LorAnimationComment.js";
 /** @type {number} コメントの次の文字を表示する間隔[ミリ秒] */
 const DELAY_MILLISECONDS = 150;
 
+/** @type {number} コメント文字を小刻みに揺らす間隔[ミリ秒] */
+const SHAKING_MILLISECONDS = 300;
+
 /** @type {number} コメントが完全に表示されてからフェードアウトが始まるまでの時間[ミリ秒] */
 const COMMENT_DISPLAY_MILLISECONDS = 8000;
 
@@ -21,6 +24,8 @@ export class LorAnimator {
   #typingQueue;
   /** @type {number?} タイピングアニメーションの制御に使うタイマー (setInterval) 関数の識別子。値が null の場合はタイマーが動作していない状態を表します */
   #typingTimerId;
+  /** @type {number?} 文字を小刻みに揺らすアニメーションの制御に使うタイマー (setInterval) 関数の識別子。値が null の場合はタイマーが動作していない状態を表します */
+  #shakingTimerId;
 
   /** @type {LorAnimationComment[]} 制御対象の LoR 風アニメーションコメントのリスト */
   get comments() {
@@ -35,6 +40,7 @@ export class LorAnimator {
     this.#commentList = [];
     this.#typingQueue = [];
     this.#typingTimerId = null;
+    this.#shakingTimerId = null;
   }
 
   /**
@@ -45,6 +51,7 @@ export class LorAnimator {
    */
   refresh(oneComments) {
     this.#stopTypingAnimation();
+    this.#stopShakingAnimation();
 
     const oldMap = this.#commentMap;
     this.#commentMap = new Map();
@@ -61,6 +68,7 @@ export class LorAnimator {
     });
 
     this.#startTypingAnimation();
+    this.#startShakingAnimation();
   }
 
   /**
@@ -102,5 +110,34 @@ export class LorAnimator {
 
     clearInterval(this.#typingTimerId);
     this.#typingTimerId = null;
+  }
+
+  /**
+   * 文字を小刻みに揺らすアニメーションを開始します。
+   */
+  #startShakingAnimation() {
+    if (this.#shakingTimerId != null) {
+      return;
+    }
+
+    this.#shakingTimerId = setInterval(() => {
+      this.#commentList.forEach(comment => {
+        comment.characters.forEach(char => {
+          char.shake();
+        });
+      });
+    }, SHAKING_MILLISECONDS);
+  }
+
+  /**
+   * 文字を小刻みに揺らすアニメーションを停止します。
+   */
+  #stopShakingAnimation() {
+    if (this.#shakingTimerId == null) {
+      return;
+    }
+
+    clearInterval(this.#shakingTimerId);
+    this.#shakingTimerId = null;
   }
 }
