@@ -13,6 +13,7 @@ function Main() {
     $WebpackMode = "production"
     $OutputDirPath = [Path]::Combine($RootDirPath, "dist\")
     $SrcDirPath = [Path]::Combine($RootDirPath, "src\")
+    $DocsDirPath = [Path]::Combine($RootDirPath, "docs\")
     $WebpackCommandPath =[Path]::Combine($RootDirPath, "node_modules\.bin\webpack")
 
     if (-not [File]::Exists($WebpackCommandPath)) { throw $WEBPACK_NOT_INSTALLED }
@@ -21,8 +22,8 @@ function Main() {
     if ([Directory]::Exists($OutputDirPath)) { [Directory]::Delete($OutputDirPath, $True) }
 
     Start-Process -Wait -FilePath "$WebpackCommandPath" -ArgumentList ("--mode", $WebpackMode)
-    Copy-Files $RootDirPath $OutputDirPath "README.txt"
-    Copy-Files $RootDirPath $OutputDirPath "LICENSE.txt"
+    Copy-Files $DocsDirPath $OutputDirPath "README.txt"
+    Copy-Files $DocsDirPath $OutputDirPath "LICENSE.txt"
     Copy-Files ([Path]::Combine($SrcDirPath, "lor-like-comment\")) `
                ([Path]::Combine($OutputDirPath, "templates\lor-like-comment\"))
 }
