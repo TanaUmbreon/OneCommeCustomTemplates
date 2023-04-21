@@ -28,13 +28,16 @@
   transition: opacity 2s;
 }
 
+.comment-text-pre-boxing {
+  position: relative;
+  visibility: hidden;
+}
 .comment-text {
   position: absolute;
   text-align: center;
 }
 .comment-text-for-speech {
-  position: relative;
-  visibility: hidden;
+  display: none;
 }
 
 .comment-text-shadow {

@@ -78,11 +78,29 @@ export class LorAnimationChar {
     style.transform = `rotate(${Random.nextInt(CHAR_ROTATE_MIN, CHAR_ROTATE_MAX)}deg)`;
   }
 
+  /**
+   * 現在の状態に基づいてこの文字の HTML ソースコードを構築して返します。
+   * @returns この文字の HTML ソースコード。
+   */
   buildContent() {
-    const isActiveStyle = this.hasActivated ? IS_ACTIVE_STYLE : "";
+    const isActiveStyle = this.#hasActivated ? IS_ACTIVE_STYLE : "";
     const isImageStyle = this.isImage ? HIDDEN_STYLE : "";
     return (
       `<div id="${this.#id}" class="${TYPING_BLOCK_STYLE} ${isActiveStyle}">` +
+      `<span class="comment-text-shadow ${isImageStyle}">${this.#content}</span>` +
+      `<span class="comment-text-front">${this.#content}</span>` +
+      `</div>`
+    );
+  }
+
+  /**
+   * 現在の状態に基づいてこの文字の表示領域確保用 HTML ソースコードを構築して返します。
+   * @returns この文字の HTML ソースコード。
+   */
+  buildPreBoxingContent() {
+    const isImageStyle = this.isImage ? HIDDEN_STYLE : "";
+    return (
+      `<div class="${TYPING_BLOCK_STYLE} ${IS_ACTIVE_STYLE}">` +
       `<span class="comment-text-shadow ${isImageStyle}">${this.#content}</span>` +
       `<span class="comment-text-front">${this.#content}</span>` +
       `</div>`

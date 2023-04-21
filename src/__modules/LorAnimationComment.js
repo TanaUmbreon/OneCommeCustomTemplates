@@ -44,6 +44,8 @@ export class LorAnimationComment {
   style;
   /** @type {string} アニメーション表示のコメント本文として使用する HTML ソースコード */
   animationContent;
+  /** @type {string} アニメーション表示のコメント本文の表示領域確保用として使用する HTML ソースコード */
+  preBoxingAnimationContent;
   /** @type {string} 読み上げ用のコメント本文として使用する HTML ソースコード */
   speechContent;
   /** @type {boolean} このコメントを非アクティブ化してフェードアウトアニメーションを行った事を示す値 */
@@ -71,25 +73,24 @@ export class LorAnimationComment {
     this.style = this.#buildStyle();
     this.#characters = this.#buildCharacters(oneComment);
 
-    let animation = "";
-    let speech = "";
+    this.animationContent = "";
+    this.preBoxingAnimationContent = "";
+    this.speechContent = "";
     this.#characters.forEach(c => {
-      animation += c.buildContent();
-      speech += c.content;
+      this.animationContent += c.buildContent();
+      this.preBoxingAnimationContent += c.buildPreBoxingContent();
+      this.speechContent = c.content;
     });
-    this.animationContent = animation;
-    this.speechContent = speech;
   }
 
   /**
    * 現在の状態に基づいて HTML ソースコードをリフレッシュします。
    */
   refreshContent() {
-    let content = "";
+    this.animationContent = "";
     this.#characters.forEach((c) => {
-      content += c.buildContent();
+      this.animationContent += c.buildContent();
     });
-    this.animationContent = content;
   }
 
   /**
