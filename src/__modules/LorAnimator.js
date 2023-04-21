@@ -4,7 +4,7 @@ import { LorAnimationComment } from "./LorAnimationComment.js";
 /** @typedef {import("../__modules/LorAnimationChar").LorAnimationChar} LorAnimationChar */
 
 /** @type {number} コメントの次の文字を表示する間隔[ミリ秒] */
-const DELAY_MILLISECONDS = 150;
+const DELAY_MILLISECONDS = 100;
 
 /** @type {number} コメント文字を小刻みに揺らす間隔[ミリ秒] */
 const SHAKING_MILLISECONDS = 300;
@@ -122,6 +122,7 @@ export class LorAnimator {
 
     this.#shakingTimerId = setInterval(() => {
       this.#commentList.forEach(comment => {
+        if (comment.hasDeactivated) { return; }
         comment.characters.forEach(char => {
           char.shake();
         });

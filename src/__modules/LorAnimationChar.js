@@ -8,9 +8,9 @@ const TYPING_BLOCK_STYLE = "typing-block";
 const HIDDEN_STYLE = "hidden";
 
 /** @type {number} 文字の回転角度の最小値[度] */
-const CHAR_ROTATE_MIN = -2;
+const CHAR_ROTATE_MIN = -3;
 /** @type {number} 文字の回転角度の最小値[度] */
-const CHAR_ROTATE_MAX = 2;
+const CHAR_ROTATE_MAX = 3;
 
 /**
  * LoR (Library Of Ruina) 風アニメーションを行うコメント本文の単一の文字を表します。
@@ -18,10 +18,15 @@ const CHAR_ROTATE_MAX = 2;
 export class LorAnimationChar {
   /** @type {string} コメント文字の要素を特定する ID 名 */
   #id;
-  /** @type {string} コメント文字を表す HTML 要素のコンテンツ */
-  #content;
   /** @type {boolean} この文字をアクティブ化してタイピングアニメーションを行った事を示す値 */
   #hasActivated;
+
+  /** @type {string} コメント文字を表す HTML 要素のコンテンツ */
+  #content;
+  /** @type {string} コメント文字を表す HTML 要素のコンテンツ */
+  get content() {
+    return this.#content;
+  }
 
   /** @type {LorAnimationComment} このコメント文字が含まれるコメント */
   #owner;
@@ -78,8 +83,8 @@ export class LorAnimationChar {
     const isImageStyle = this.isImage ? HIDDEN_STYLE : "";
     return (
       `<div id="${this.#id}" class="${TYPING_BLOCK_STYLE} ${isActiveStyle}">` +
-      `<span class="comment-text-front">${this.#content}</span>` +
       `<span class="comment-text-shadow ${isImageStyle}">${this.#content}</span>` +
+      `<span class="comment-text-front">${this.#content}</span>` +
       `</div>`
     );
   }

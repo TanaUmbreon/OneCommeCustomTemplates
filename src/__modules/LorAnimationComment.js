@@ -71,10 +71,14 @@ export class LorAnimationComment {
     this.style = this.#buildStyle();
     this.#characters = this.#buildCharacters(oneComment);
 
-    let content = "";
-    this.#characters.forEach((c) => (content += c.content));
-    this.animationContent = content;
-    this.speechContent = content;
+    let animation = "";
+    let speech = "";
+    this.#characters.forEach(c => {
+      animation += c.buildContent();
+      speech += c.content;
+    });
+    this.animationContent = animation;
+    this.speechContent = speech;
   }
 
   /**

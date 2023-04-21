@@ -14,30 +14,10 @@
 }
 
 /* Library of Ruina風コメントの実装部分 */
-.comment-text {
-  position: relative;
+.comments {
   color: var(--lor-like-comment-color);
   font-family: var(--lor-like-comment-font-family);
   font-size: 1rem;
-  text-shadow: 0 0 0.15em var(--lor-like-comment-stroke-fore-color);
-  -webkit-text-stroke: 0.1em var(--lor-like-comment-stroke-back-color);
-  text-align: center;
-}
-.comment-text-front {
-  position: absolute;
-  text-shadow: none;
-  -webkit-text-stroke: 0 transparent;
-}
-
-.typing-block {
-  display: inline-block;
-  opacity: 0;
-}
-.typing-block.is-active {
-  opacity: 1;
-}
-.hidden {
-  visibility: hidden;
 }
 
 .comment {
@@ -48,7 +28,39 @@
   transition: opacity 2s;
 }
 
+.comment-text {
+  position: absolute;
+  text-align: center;
+}
+.comment-text-for-speech {
+  position: relative;
+  visibility: hidden;
+}
+
+.comment-text-shadow {
+  position: absolute;
+  text-shadow: 0 0 0.15em var(--lor-like-comment-stroke-fore-color);
+  -webkit-text-stroke: 0.1em var(--lor-like-comment-stroke-back-color);
+}
+.comment-text-front {
+  position: relative;
+  text-shadow: none;
+  -webkit-text-stroke: 0 transparent;
+}
+
+.typing-block {
+  display: none;
+  opacity: 0;
+}
+.typing-block.is-active {
+  display: inline-block;
+  opacity: 1;
+}
+.hidden {
+  visibility: hidden;
+}
+
 /* 不要な要素を非表示にする */
-.avatar, .name, .paid-text, .comment-text-for-speech {
+.avatar, .name, .paid-text {
   display: none;
 }
