@@ -140,7 +140,6 @@ export class LorAnimationComment {
       // eslint-disable-next-line security/detect-object-injection
       const char = oneCommentChars[position];
       const id = `${oneComment.data.id}-${lorCommentChars.length}`;
-      const isLast = (oneCommentChars.length - 1) <= position;
 
       // Note:
       // 参照した文字charが<img>要素の開始だった場合は<img>要素丸ごと1つ、それ以外はエスケープしたものをコメント文字として扱う。
@@ -157,6 +156,7 @@ export class LorAnimationComment {
           oneCommentChars = oneCommentChars.slice(position + imgLength);
           position = 0;
 
+          const isLast = (oneCommentChars.length) <= position;
           lorCommentChars.push(new LorAnimationChar(this, id, imgMatched[0], isLast));
           continue;
         }
@@ -165,6 +165,7 @@ export class LorAnimationComment {
       position++;
 
       const escaped = escape(char);
+      const isLast = (oneCommentChars.length) <= position;
       lorCommentChars.push(new LorAnimationChar(this, id, escaped, isLast));
     }
 
