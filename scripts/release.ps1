@@ -22,6 +22,7 @@ function Main() {
 
     Start-Process -Wait -FilePath "$WebpackCommandPath" -ArgumentList ("--mode", $WebpackMode)
     Copy-Files $RootDirPath $OutputDirPath "README.txt"
+    Copy-Files $RootDirPath $OutputDirPath "LICENSE.txt"
     Copy-Files ([Path]::Combine($SrcDirPath, "lor-like-comment\")) `
                ([Path]::Combine($OutputDirPath, "templates\lor-like-comment\"))
 }
