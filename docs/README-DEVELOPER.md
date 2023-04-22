@@ -2,7 +2,7 @@
 
 ## 開発するための前提条件
 
-「[利用するための前提条件](https://github.com/TanaUmbreon/OneCommeCustomTemplates/README.md#利用するための前提条件)」に加え、以下の環境を前提としています。
+「[利用するための前提条件](https://github.com/TanaUmbreon/OneCommeCustomTemplates/blob/main/README.md#利用するための前提条件)」に加え、以下の環境を前提としています。
 
 - 「[Visual Studio Code](https://code.visualstudio.com/)」(以下、「VSCode」)がPCにインストールされていて、かつ拡張機能の「ESLint」と「Prettier - Code formatter」が「VSCode」にインストールされていること。開発エディタとして使用します。
 - 「[Node.js](https://nodejs.org/ja)」がPCにインストールされていて、かつ「Node.js」の「npm」コマンドがターミナルやコマンドプロンプト等(以下、「ターミナル」)で使用できるようパスが通っていること。開発を補助するツールやライブラリーをセットアップし、使用できるようにします。
