@@ -28,6 +28,10 @@
   transition: opacity 2s;
 }
 
+.comment-body img {
+  height: 1rem;
+}
+
 .comment-text-pre-boxing {
   position: relative;
   visibility: hidden;
