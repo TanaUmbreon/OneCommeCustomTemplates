@@ -4,13 +4,16 @@ import { LorAnimationComment } from "./LorAnimationComment.js";
 /** @typedef {import("../__modules/LorAnimationChar").LorAnimationChar} LorAnimationChar */
 
 /** @type {number} コメントの次の文字を表示する間隔[ミリ秒] */
-const DELAY_MILLISECONDS = 100;
+const DELAY_MILLISECONDS = 1000;
 
 /** @type {number} コメント文字を小刻みに揺らす間隔[ミリ秒] */
 const SHAKING_MILLISECONDS = 300;
 
 /** @type {number} コメントが完全に表示されてからフェードアウトが始まるまでの時間[ミリ秒] */
 const COMMENT_DISPLAY_MILLISECONDS = 8000;
+
+/** @type {number} コメントが完全に表示されてから次のコメントが表示されるまでの時間[ミリ秒] */
+const NEXT_COMMENT_MILLISECONDS = 2000;
 
 /**
  * LoR (Library Of Ruina) 風アニメーションを制御します。
@@ -26,6 +29,8 @@ export class LorAnimator {
   #typingTimerId;
   /** @type {number?} 文字を小刻みに揺らすアニメーションの制御に使うタイマー (setInterval) 関数の識別子。値が null の場合はタイマーが動作していない状態を表します */
   #shakingTimerId;
+  /** @type {number?} 次のコメントを表示させるまでの待機時間タイマー (setTimeout) 関数の識別子。値が null の場合はタイマーが動作しておらずコメント表示可能な状態を表します */
+  #nextCommentTimerId;
 
   /** @type {LorAnimationComment[]} 制御対象の LoR 風アニメーションコメントのリスト */
   get comments() {
@@ -41,6 +46,7 @@ export class LorAnimator {
     this.#typingQueue = [];
     this.#typingTimerId = null;
     this.#shakingTimerId = null;
+    this.#nextCommentTimerId = null;
   }
 
   /**
@@ -90,13 +96,24 @@ export class LorAnimator {
         this.#stopTypingAnimation();
         return;
       }
+
+      if (this.#nextCommentTimerId != null) { return; }
+      // 次のコメント表示の待機時間タイマーが動作していなければこれ以降の処理を行う
       
       char.activate();
       if (!char.isLast) { return; }
+      // コメント内の最後の文字ならばこれ以降の処理を行う
 
       setTimeout(() => {
         char.owner.deactivation();
       }, COMMENT_DISPLAY_MILLISECONDS);
+
+      if (this.#typingQueue.length == 0) { return; }
+      // 次に表示させるコメントがある場合はこれ以降の処理を行う
+
+      this.#nextCommentTimerId = setTimeout(() => {
+        this.#nextCommentTimerId = null;
+      }, NEXT_COMMENT_MILLISECONDS);
     }, DELAY_MILLISECONDS);
   }
 
