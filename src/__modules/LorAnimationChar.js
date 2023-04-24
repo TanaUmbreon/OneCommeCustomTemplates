@@ -18,8 +18,12 @@ const CHAR_ROTATE_MAX = 3;
 export class LorAnimationChar {
   /** @type {string} コメント文字の要素を特定する ID 名 */
   #id;
+  
   /** @type {boolean} この文字をアクティブ化してタイピングアニメーションを行った事を示す値 */
   #hasActivated;
+  get hasActivated() {
+    return this.#hasActivated;
+  }
 
   /** @type {string} コメント文字を表す HTML 要素のコンテンツ */
   #content;

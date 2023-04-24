@@ -1,10 +1,12 @@
 import { LorAnimationComment } from "./LorAnimationComment.js";
+import { LorTypingAnimationTask } from "./LorTypingAnimationTask.js";
 
 /** @typedef {import("../__types/onesdk").CommonData} CommonData */
 /** @typedef {import("../__modules/LorAnimationChar").LorAnimationChar} LorAnimationChar */
+/** @typedef {import("./AnimationTaskBase").AnimationTaskBase} AnimationTaskBase */
 
 /** @type {number} コメントの次の文字を表示する間隔[ミリ秒] */
-const DELAY_MILLISECONDS = 1000;
+const DELAY_MILLISECONDS = 100;
 
 /** @type {number} コメント文字を小刻みに揺らす間隔[ミリ秒] */
 const SHAKING_MILLISECONDS = 300;
@@ -32,6 +34,9 @@ export class LorAnimator {
   /** @type {number?} 次のコメントを表示させるまでの待機時間タイマー (setTimeout) 関数の識別子。値が null の場合はタイマーが動作しておらずコメント表示可能な状態を表します */
   #nextCommentTimerId;
 
+  /** @type {AnimationTaskBase[]} アニメーションタスクのキュー */
+  #animationTaskQueue;
+
   /** @type {LorAnimationComment[]} 制御対象の LoR 風アニメーションコメントのリスト */
   get comments() {
     return this.#commentList;
@@ -47,6 +52,8 @@ export class LorAnimator {
     this.#typingTimerId = null;
     this.#shakingTimerId = null;
     this.#nextCommentTimerId = null;
+
+    this.#animationTaskQueue = [];
   }
 
   /**
@@ -63,6 +70,21 @@ export class LorAnimator {
     this.#commentMap = new Map();
     this.#commentList = [];
     this.#typingQueue = [];
+    this.#animationTaskQueue = [];
+    oneComments.forEach((oneComment) => {
+      const id = oneComment.data.id;
+      const lorComment = oldMap.get(id) ?? new LorAnimationComment(oneComment);
+      lorComment.refreshContent();
+      this.#commentMap.set(id, lorComment);
+      this.#commentList.push(lorComment);
+
+      this.#animationTaskQueue.push(
+        ...lorComment.characters
+          .filter(c => !c.hasActivated)
+          .map(c => new LorTypingAnimationTask(c))
+      );
+      this.#animationTaskQueue.push(new WaitToNextCommentAnimationTask());
+    });
 
     oneComments.forEach((oneComment) => {
       const id = oneComment.data.id;
